@@ -176,7 +176,7 @@ exports.updateById = updateById;
     console.log('deleted successfully');
   })
 
-  db.updateById("1", { body: "new content" }).then(updatedPost => {
+  db.updateById("1", { body: "new content" }).then(updatedPost =>{
     if (updatedPost) {
       // Post updated
     } else {
