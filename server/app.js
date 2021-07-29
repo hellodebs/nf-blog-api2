@@ -1,7 +1,8 @@
 const express = require("express");
-const db = require("./lib/db");
+//const db = require("./lib/db");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const Article = require("./models/article");
 
 /*
   We create an express app calling
@@ -38,25 +39,25 @@ app.get("/", (req, res) => {
   });
 });
 
-function validateRequest(req, res, next) {
-  if (!req.body.title) {
-    res.status(400).json({
-      error: "Request body must contain a title property",
-    });
-    return;
-  }
-  if (!req.body.body) {
-    res.status(400).json({
-      error: "Request body must contain a body property",
-    });
-    return;
-  }
+// function validateRequest(req, res, next) {
+//   if (!req.body.title) {
+//     res.status(400).json({
+//       error: "Request body must contain a title property",
+//     });
+//     return;
+//   }
+//   if (!req.body.body) {
+//     res.status(400).json({
+//       error: "Request body must contain a body property",
+//     });
+//     return;
+//   }
 
-  next();
-}
+//   next();
+// }
 
-app.get("/articles", validateRequest, (req, res) => {
-  db.findAll()
+app.get("/articles", (req, res) => {
+  Article.find()
     .then((data) => {
       res.send(data);
     })
@@ -64,21 +65,21 @@ app.get("/articles", validateRequest, (req, res) => {
 });
 
 app.post("/articles", (req, res) => {
-  const articles = req.body;
-  db.insert(articles).then((data) => {
-    res.status(201).send(data);
-  });
+  Article.create(req.body)
+    .then((newArticle) => {
+      res.status(201).send(newArticle);
+    })
+    .catch(() => res.status(500).send("There was a mistake"));
 });
 
 app.get("/articles/:id", (req, res) => {
   const id = req.params.id;
-  db.findById(id)
+  Article.findById(id)
     .then((data) => {
       if (!data) {
         res.status(404).end();
         return;
       }
-
       res.send(data);
     })
     .catch(() => {
@@ -89,8 +90,8 @@ app.get("/articles/:id", (req, res) => {
 app.patch("/articles/:id", (req, res) => {
   const id = req.params.id;
   const content = req.body;
-  console.log(content);
-  db.updateById(id, content)
+
+  Article.findByIdAndUpdate(id, content, { new: true })
     .then((data) => {
       if (!data) {
         throw "Article was not found";
@@ -104,7 +105,7 @@ app.patch("/articles/:id", (req, res) => {
 
 app.delete("/articles/:id", (req, res) => {
   const id = req.params.id;
-  db.deleteById(id)
+  Article.findByIdAndRemove(id)
     .then(() => {
       res.status(204).send();
     })
@@ -122,6 +123,7 @@ mongoose
   .connect("mongodb://localhost:27017/articles-api", {
     useUnifiedTopology: true,
     useNewUrlParser: true,
+    useFindAndModify: false,
   })
   .then(() => {
     console.log("conntected to mongo");
