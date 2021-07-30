@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const Article = require("./models/article");
+const Author = require("./models/author");
 
 /*
   We create an express app calling
@@ -58,6 +59,7 @@ app.get("/", (req, res) => {
 
 app.get("/articles", (req, res) => {
   Article.find()
+    .populate("author")
     .then((data) => {
       res.send(data);
     })
@@ -66,8 +68,9 @@ app.get("/articles", (req, res) => {
 
 app.post("/articles", (req, res) => {
   Article.create(req.body)
-    .then((newArticle) => {
-      res.status(201).send(newArticle);
+    .populate("author")
+    .then((data) => {
+      res.status(201).send(data);
     })
     .catch(() => res.status(500).send("There was a mistake"));
 });
@@ -112,6 +115,26 @@ app.delete("/articles/:id", (req, res) => {
     .catch(() => {
       res.status(500).end();
     });
+});
+
+//create an author
+app.post("/authors", (req, res) => {
+  Author.create(req.body)
+
+    .then((data) => {
+      res.status(201).send(data);
+    })
+    .catch(() => res.status(500).send("There was a mistake"));
+});
+
+//list all authors
+app.get("/authors", (req, res) => {
+  Author.find()
+
+    .then((data) => {
+      res.send(data);
+    })
+    .catch(() => res.status(500).send("There was a mistake"));
 });
 
 /*
