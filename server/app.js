@@ -68,8 +68,9 @@ app.get("/articles", (req, res) => {
 
 app.post("/articles", (req, res) => {
   Article.create(req.body)
-    .populate("author")
     .then((data) => {
+      console.log(data.populate("author"));
+
       res.status(201).send(data);
     })
     .catch(() => res.status(500).send("There was a mistake"));

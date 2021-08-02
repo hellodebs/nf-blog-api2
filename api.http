@@ -8,7 +8,7 @@ Content-Type: application/json
 {
 "title": "Title",
 "body": "I love chowchows",
-"author": "Wassupaödslfjaöweoijföowejfö"
+"author": "6102c660fa488182e2ec9523"
 }
 
 ###GET articles/:id
